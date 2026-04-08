@@ -146,6 +146,36 @@ def insertTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existen
     return idCreado
 
 
+def eliminarTablaProducto(id):
+    """
+    Maneja la instrucción de eliminación en la tabla `producto` de la base de datos.
+    
+    :param id: ID del producto a eliminar.
+    :return: `True` si el producto fue eliminado exitosamente, `False` si el producto no existe.
+    """
+    # Se crea una conexión a la base de datos.
+    conn = conexionDB()
+    
+    # Se ejecuta una consulta de eliminación utilizando el ID como parámetro.
+    cursor = conn.execute(
+        """
+        DELETE FROM producto
+        WHERE id = ?;
+        """
+        ,(id,)
+    )
+    # Se verifica si la fila fue eliminada exitosamente
+    # (rowcount > 0 indica que se eliminó al menos una fila).
+    productoEliminado = cursor.rowcount > 0
+    
+    # Se confirman los cambios y se cierra la conexión.
+    conn.commit()
+    conn.close()
+    
+    # Se regresa True si el producto fue eliminado, False de lo contrario.
+    return productoEliminado
+
+
 def verificarProducto(diccionarioProducto, incluirID):
     """
     Verifica que un diccionario otorgado cuente con las claves esperadas

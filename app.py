@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from helpers import NOMBRE_TABLA_PRODUCTO
-from helpers import existeTabla, createTablaProducto, selectTablaProducto, insertTablaProducto, verificarProducto
+from helpers import existeTabla, createTablaProducto, selectTablaProducto, insertTablaProducto, verificarProducto, eliminarTablaProducto
 
 # Creación del objeto app y configuración del ordenamiento de claves en JSON
 app = Flask(__name__)
@@ -32,6 +32,25 @@ def productoSingular():
         # Si no se encontraron errores, se crea una entrada a la base de datos y se informa al usuario del éxito.
         idCreado = insertTablaProducto(solicitud["nombre"],solicitud["categoria"],solicitud["precioMenudeo"],solicitud["precioMayoreo"],solicitud["existencias"])
         return jsonify({"Mensaje": f"Producto creado con ID #{idCreado}"}), 201
+
+# Método DELETE por ID
+@app.route('/productos/<int:id>', methods=['DELETE'])
+def eliminarProducto(id):
+    # Si no existe la tabla 'producto':
+    # - Se devuelve un error
+    if not existeTabla(NOMBRE_TABLA_PRODUCTO):
+        return jsonify({'Error': 'No existen registros de productos (Crear con POST).'}), 404
+    
+    # Se intenta eliminar el producto con el ID proporcionado
+    productoEliminado = eliminarTablaProducto(id)
+    
+    # Si el producto fue eliminado exitosamente, se devuelve un mensaje de éxito
+    if productoEliminado:
+        return jsonify({"Mensaje": f"Producto con ID #{id} eliminado exitosamente"}), 200
+    # Si el producto no existe, se devuelve un error 404
+    else:
+        return jsonify({"Error": f"No existe un producto con ID #{id}"}), 404
+    
 
 # Método main
 def main():
