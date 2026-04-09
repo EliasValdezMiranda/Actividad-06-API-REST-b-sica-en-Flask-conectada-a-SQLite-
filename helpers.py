@@ -2,6 +2,8 @@ import json
 import os
 import sqlite3
 
+from app import productoActualizado
+
 # Nombre de la base de datos y nombre de la tabla principal 0producto'
 BASE_DATOS = "inventario.db"
 NOMBRE_TABLA_PRODUCTO = "producto"
@@ -145,6 +147,44 @@ def insertTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existen
     # Se regresa el ID de la fila creada.
     return idCreado
 
+def actualizarTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existencias):
+    """
+    Maneja la instrucción de actualización en la tabla `producto` de la base de datos.
+
+    :param nombre: Nombre del producto por registrar.
+    :param categoria: Nombre de la categoría en la que se encontrará el producto.
+    :param precioMenudeo: Valor numérico correspondiente al precio a menudeo del producto.
+    :param precioMayoreo: Valor numérico correspondiente al precio a mayoreo del producto.
+    :param existencias: Valor numérico entero correspondiente a la cantidad de existencias del producto.
+    :return: ID correspondiente al producto recien actualizado.
+    """
+
+    # Se crea una conexión a la base de datos
+    conn = conexionDB()
+
+    # Se ejecuta el comando de actualización en la tabla 'productos' de la base de datos
+    # Toma como referencia la id provista en la ruta
+    cursor = conn.execute("""
+                 UPDATE productos
+                 SET nombre = ?,
+                     categoria = ?,
+                     precioMenudeo  = ?,
+                     precioMayoreo = ?,
+                     existencias = ?
+                 WHERE id = ?
+                 """, (nombre, categoria, precioMenudeo, precioMayoreo, existencias, id))
+
+    # Se verifica si la fila fue eliminada exitosamente
+    # (rowcount > 0 indica que se actualizó al menos una fila).
+    productoActualizado = cursor.rowcount > 0
+
+    # Se confirma la modificación sobre la base de datos, se cierra la conexión y
+    # se devuelve True si se actualizó, False de lo contrario
+    conn.commit()
+    conn.close()
+
+    # Se regresa True si el producto fue actualizado, False de lo contrario
+    return productoActualizado
 
 def eliminarTablaProducto(id):
     """
@@ -174,7 +214,6 @@ def eliminarTablaProducto(id):
     
     # Se regresa True si el producto fue eliminado, False de lo contrario.
     return productoEliminado
-
 
 def verificarProducto(diccionarioProducto, incluirID):
     """
