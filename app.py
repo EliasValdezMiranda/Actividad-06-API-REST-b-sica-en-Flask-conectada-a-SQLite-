@@ -53,8 +53,14 @@ def actualizarProducto(id):
     if not existeTabla(NOMBRE_TABLA_PRODUCTO):
         return jsonify({'Error': 'No existen registros de productos (Crear con POST).'}), 404
 
+    solicitud = request.get_json()
+    resultado = verificarProducto(solicitud, False)
+    # Si se obtiene un resultado diferente de None, se obtuvo un mensaje de error y se regresa en formato JSON.
+    if resultado is not None:
+        return jsonify(resultado), 400
+    
     # Se intenta actualizar el producto con el ID proporcionado
-    productoActualizado = actualizarTablaProducto(id)
+    productoActualizado = actualizarTablaProducto(solicitud["nombre"],solicitud["categoria"],solicitud["precioMenudeo"],solicitud["precioMayoreo"],solicitud["existencias"],id)
     # Si el producto fue actualizado correctamente, se devuelve un mensaje de éxito
     if productoActualizado:
         return jsonify({"Mensaje": f"Producto  con ID #{id} actualizado exitosamente"}), 200

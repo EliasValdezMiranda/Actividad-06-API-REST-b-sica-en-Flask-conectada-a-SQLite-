@@ -207,7 +207,7 @@ def actualizarTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, exi
     # Se ejecuta el comando de actualización en la tabla 'productos' de la base de datos
     # Toma como referencia la id provista en la ruta
     cursor = conn.execute("""
-                 UPDATE productos
+                 UPDATE producto
                  SET nombre = ?,
                      categoria = ?,
                      precioMenudeo  = ?,
