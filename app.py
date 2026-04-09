@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, Response
 from helpers import NOMBRE_TABLA_PRODUCTO
-from helpers import existeTabla, createTablaProducto, selectTablaProducto, insertTablaProducto, verificarProducto, eliminarTablaProducto, actualizarTablaProducto
+from helpers import existeTabla, createTablaProducto, selectTablaProducto, insertTablaProducto, verificarProducto, eliminarTablaProducto, actualizarTablaProducto, encontrarProducto
 
 # Creación del objeto app y configuración del ordenamiento de claves en JSON
 app = Flask(__name__)
@@ -32,6 +32,18 @@ def productoSingular():
         # Si no se encontraron errores, se crea una entrada a la base de datos y se informa al usuario del éxito.
         idCreado = insertTablaProducto(solicitud["nombre"],solicitud["categoria"],solicitud["precioMenudeo"],solicitud["precioMayoreo"],solicitud["existencias"])
         return jsonify({"Mensaje": f"Producto creado con ID #{idCreado}"}), 201
+
+# Método GET por ID
+@app.route('/productos/<int:id>', methods=['GET'])
+def encontrarProductoSingular(id):
+    # Si no existe la tabla 'producto':
+    # - Se devuelve un error
+    if not existeTabla(NOMBRE_TABLA_PRODUCTO):
+        return jsonify({'Error': 'No existen registros de productos (Crear con POST).'}), 404
+    
+    # Se busca el producto con el ID proporcionado
+    return jsonify(encontrarProducto(id)), 200
+
 
 # Método PUT por ID
 @app.route("/productos/<int:id>", methods=['PUT'])

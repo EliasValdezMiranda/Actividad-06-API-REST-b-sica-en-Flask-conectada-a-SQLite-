@@ -2,8 +2,6 @@ import json
 import os
 import sqlite3
 
-from app import productoActualizado
-
 # Nombre de la base de datos y nombre de la tabla principal 0producto'
 BASE_DATOS = "inventario.db"
 NOMBRE_TABLA_PRODUCTO = "producto"
@@ -117,6 +115,50 @@ def selectTablaProducto():
     conn.close()
     return productos
 
+def encontrarProducto(id):
+    """
+    Maneja la instrucción de selección de la tabla `producto` de la base de datos en base a una ID proporcionada.
+
+    :param id: Id del producto que se buscará
+    :return: Diccionario correspondiente a la fila de la tabla `producto` con la ID buscada.
+    """
+
+    # Se crea una conexión a la base de datos
+    # y se almacena su cursor en una variable.
+    conn = conexionDB()
+    cursor = conn.cursor()
+    # Se ejecuta la consulta de selección.
+    cursor.execute(
+        """
+        SELECT
+            id, 
+            nombre,
+            categoria,
+            precioMenudeo,
+            precioMayoreo,
+            existencias
+        FROM producto
+        WHERE id = ?;
+        """
+        ,(id,) 
+    )
+    # Se extraen las filas del cursor y se agregan
+    # a una lista en forma de diccionarios.
+    datos = cursor.fetchall()
+    productos = []
+    for fila in datos:
+        productos.append({
+            "id": fila[0],
+            "nombre": fila[1],
+            "categoria": fila[2],
+            "precioMenudeo": fila[3],
+            "precioMayoreo": fila[4],
+            "existencias": fila[5]
+        })
+    # Se cierra la conexión y se devuelven la lista de filas.
+    conn.close()
+    return productos    
+
 
 def insertTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existencias):
     """
@@ -147,7 +189,7 @@ def insertTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existen
     # Se regresa el ID de la fila creada.
     return idCreado
 
-def actualizarTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existencias):
+def actualizarTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, existencias, id):
     """
     Maneja la instrucción de actualización en la tabla `producto` de la base de datos.
 
@@ -172,7 +214,7 @@ def actualizarTablaProducto(nombre, categoria, precioMenudeo, precioMayoreo, exi
                      precioMayoreo = ?,
                      existencias = ?
                  WHERE id = ?
-                 """, (nombre, categoria, precioMenudeo, precioMayoreo, existencias, id))
+                 """, (nombre, categoria, precioMenudeo, precioMayoreo, existencias, id,))
 
     # Se verifica si la fila fue eliminada exitosamente
     # (rowcount > 0 indica que se actualizó al menos una fila).
